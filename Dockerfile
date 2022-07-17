@@ -1,5 +1,5 @@
 # FROM 基于 golang:1.16-alpine
-FROM golang:1.16 AS builder
+FROM golang:1.17-alpine AS builder
 
 # ENV 设置环境变量
 ENV GOPATH=/opt/repo
