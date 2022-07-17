@@ -5,7 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/tektoncd/triggers/pkg/apis/triggers/v1alpha1"
+
+	triggersv1 "github.com/tektoncd/triggers/pkg/apis/triggers/v1alpha1"
 	"google.golang.org/grpc/codes"
 )
 
@@ -13,7 +14,7 @@ func main() {
 	r := gin.New()
 
 	r.GET("/", Healthy)
-	r.POST("/", GiteeInterceptor)
+	//r.POST("/", GiteeInterceptor)
 
 	if err := r.Run(":80"); err != nil {
 		log.Fatal(err)
@@ -27,10 +28,10 @@ func Healthy(ctx *gin.Context) {
 }
 
 func GiteeInterceptor(ctx *gin.Context) {
-	req := &v1alpha1.InterceptorRequest{}
+	req := triggersv1.InterceptorRequest{}
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		ctx.JSON(http.StatusServiceUnavailable, &v1alpha1.InterceptorResponse{
-			Status: v1alpha1.Status{
+		ctx.JSON(http.StatusServiceUnavailable, &triggersv1.InterceptorResponse{
+			Status: triggersv1.Status{
 				Code:    codes.Unavailable,
 				Message: err.Error(),
 			},
@@ -40,8 +41,8 @@ func GiteeInterceptor(ctx *gin.Context) {
 
 	token, ok := req.Header["X-Xiaolatiao-Token"]
 	if !ok || len(token) == 0 || token[0] != "xiaolatao" {
-		ctx.JSON(http.StatusServiceUnavailable, &v1alpha1.InterceptorResponse{
-			Status: v1alpha1.Status{
+		ctx.JSON(http.StatusServiceUnavailable, &triggersv1.InterceptorResponse{
+			Status: triggersv1.Status{
 				Code:    codes.Unavailable,
 				Message: "Token不正确",
 			},
@@ -49,9 +50,9 @@ func GiteeInterceptor(ctx *gin.Context) {
 		return
 	}
 
-	ctx.JSON(http.StatusOK, &v1alpha1.InterceptorResponse{
+	ctx.JSON(http.StatusOK, &triggersv1.InterceptorResponse{
 		Continue: true,
-		Status: v1alpha1.Status{
+		Status: triggersv1.Status{
 			Code: codes.OK,
 		},
 	})
